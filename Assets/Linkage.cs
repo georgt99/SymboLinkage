@@ -5,6 +5,7 @@ using UnityEditor;
 
 public class Linkage : MonoBehaviour
 {
+    public GameObject linkPrefab;
 
     private List<Joint> orderedJoints;
 
@@ -29,6 +30,9 @@ public class Linkage : MonoBehaviour
 
     private void InitializeEdges()
     {
+        GameObject linkHolder = new GameObject("LinkHolder");
+        linkHolder.transform.parent = transform;
+        linkHolder.transform.localPosition = Vector3.zero;
         foreach (Joint j1 in GetComponentsInChildren<Joint>())
         {
             foreach (Joint j2 in j1.initialEdges) // initial edges are directed for simpler storage
@@ -41,6 +45,9 @@ public class Linkage : MonoBehaviour
                 };
                 j1.edges.Add(newEdge);
                 j2.edges.Add(newEdge);
+                // add prefab for visual
+                Link newLink = Instantiate(linkPrefab, linkHolder.transform).GetComponent<Link>();
+                newLink.j1 = j1; newLink.j2 = j2;
             }
         }
     }
@@ -76,7 +83,6 @@ public class Linkage : MonoBehaviour
             float phi = Mathf.Acos(
                 (distIJ * distIJ + distIK * distIK - distJK * distJK)
                 /(2 * distIJ * distIK));
-            Debug.Log(phi);
 
             Plane triPlane = new Plane(i, j, current.transform.position);
             Vector3 triNormal = triPlane.normal;
@@ -178,16 +184,19 @@ public class LinkageEditor : Editor
                         {
                             Undo.RecordObject(previousSelection, "Remove Edge");
                             previousSelection.initialEdges.Remove(selected);
+                            PrefabUtility.RecordPrefabInstancePropertyModifications(previousSelection);
                         }
                         else if (selected.initialEdges.Contains(previousSelection))
                         {
                             Undo.RecordObject(selected, "Remove Edge");
                             selected.initialEdges.Remove(previousSelection);
+                            PrefabUtility.RecordPrefabInstancePropertyModifications(selected);
                         }
                         else // didn't exist yet, add from previous to new
                         {
                             Undo.RecordObject(previousSelection, "Add Edge");
                             previousSelection.initialEdges.Add(selected);
+                            PrefabUtility.RecordPrefabInstancePropertyModifications(previousSelection);
                         }
                         previousSelection = null;
                     }
