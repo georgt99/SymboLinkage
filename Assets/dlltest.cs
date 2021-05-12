@@ -21,6 +21,6 @@ public class dlltest : MonoBehaviour
         }
 
         Vector3 pos = transform.position;
-        //Debug.Log(magnitude(pos.x, pos.y, pos.z));
+        Debug.Log(magnitude(pos.x, pos.y, pos.z));
     }
 }
