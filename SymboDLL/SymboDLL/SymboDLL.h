@@ -7,12 +7,6 @@
 #define SYMBOLINKAGE_API __declspec(dllimport)
 #endif
 
-// JUST FOR TESTING
-extern "C" SYMBOLINKAGE_API int add1(const int x);
-extern "C" SYMBOLINKAGE_API float magnitude(float x, float y, float z);
-extern "C" SYMBOLINKAGE_API void negate_vec2(float* vec);
-extern "C" SYMBOLINKAGE_API void add_vec2s(float* vec1_array, float* vec2_array, float* result_array);
-
 
 extern "C" SYMBOLINKAGE_API void symbolic_kinematic(
 	float* i_array, float* j_array,
