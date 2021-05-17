@@ -11,3 +11,5 @@
 extern "C" SYMBOLINKAGE_API int add1(const int x);
 
 extern "C" SYMBOLINKAGE_API float magnitude(float x, float y, float z);
+
+extern "C" SYMBOLINKAGE_API void negate_vec2(float* vec);

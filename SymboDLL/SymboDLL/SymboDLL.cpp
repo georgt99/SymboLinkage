@@ -6,13 +6,13 @@
 using namespace std;
 
 // Eigen
-#include "Eigen/Core"
+#include <Eigen/Core>
 using namespace Eigen;
 
 // autodiff
-#include "autodiff/forward.hpp"
-#include "autodiff/forward/eigen.hpp"
-//using namespace autodiff;
+#include <autodiff/forward.hpp>
+#include <autodiff/forward/eigen.hpp>
+using namespace autodiff;
 
 
 // DLL internal state variables:
@@ -29,5 +29,12 @@ int add1(const int x)
 float magnitude(float x, float y, float z) { //Vector3dual for me i think...?
     Vector3f vec(x, y, z);
     return vec.norm();
+}
+
+void negate_vec2(float* vec_array) {
+	//Vector2f v(vec_array[0], vec_array[1]);
+	//Vector2f negated = v.inverse();
+	vec_array[0] = - vec_array[0]; vec_array[1] = - vec_array[1]; //vec_array[0] = negated.x(); vec_array[1] = negated.y();
+	return; // TODO: is this needed?
 }
 
