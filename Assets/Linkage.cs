@@ -77,9 +77,9 @@ public class Linkage : MonoBehaviour
             Vector3 i = fixedJoints[0].transform.position;
             Vector3 j = fixedJoints[1].transform.position;
 
-            float distIJ = Vector3.Distance(i, j);
             float distIK = fixedJoints[0].GetEdgeToJoint(current).length;
             float distJK = fixedJoints[1].GetEdgeToJoint(current).length;
+            /*float distIJ = Vector3.Distance(i, j);
             float phi = Mathf.Acos(
                 (distIJ * distIJ + distIK * distIK - distJK * distJK)
                 /(2 * distIJ * distIK));
@@ -87,9 +87,13 @@ public class Linkage : MonoBehaviour
             Plane triPlane = new Plane(i, j, current.transform.position);
             Vector3 triNormal = triPlane.normal;
 
-            Quaternion R_phi = Quaternion.AngleAxis(Mathf.Rad2Deg * phi, triNormal);// todo: don't always use the 2D-normal
+            Quaternion R_phi = Quaternion.AngleAxis(Mathf.Rad2Deg * phi, triNormal);
             
             Vector3 k = R_phi * (distIK * (j - i) / Vector3.Magnitude(j - i)) + i;
+            current.transform.position = k;
+            */
+
+            Vector3 k = DllWrapper.SymbolicKinematic(i, j, distIK, distJK);
             current.transform.position = k;
 
             calculated.Add(current);

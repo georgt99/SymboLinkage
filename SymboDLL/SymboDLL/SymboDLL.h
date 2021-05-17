@@ -14,3 +14,8 @@ extern "C" SYMBOLINKAGE_API void negate_vec2(float* vec);
 extern "C" SYMBOLINKAGE_API void add_vec2s(float* vec1_array, float* vec2_array, float* result_array);
 
 
+extern "C" SYMBOLINKAGE_API void symbolic_kinematic(
+	float* i_array, float* j_array,
+	float dist_ik, float dist_jk,
+	float* output_array
+);
