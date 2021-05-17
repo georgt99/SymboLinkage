@@ -38,3 +38,10 @@ void negate_vec2(float* vec_array) {
 	return; // TODO: is this needed?
 }
 
+
+void add_vec2s(float* vec1_array, float* vec2_array, float* result_array){
+	Vector2f vec1(vec1_array[0], vec1_array[1]);
+	Vector2f vec2(vec2_array[0], vec2_array[1]);
+	Vector2f result = vec1 + vec2;
+	result_array[0] = result.x(); result_array[1] = result.y();
+}

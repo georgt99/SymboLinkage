@@ -12,6 +12,11 @@ public class dlltest : MonoBehaviour
     private static extern float magnitude(float x, float y, float z);
     [DllImport("SymboDLL")]
     public static extern void negate_vec2( [In, Out] float[] vec_array);
+    [DllImport("SymboDLL")]
+    public static extern void add_vec2s(
+        [In, Out] float[] vec1_array,
+        [In, Out] float[] vec2_array,
+        [In, Out] float[] result_array);
 
     private int i = 0;
 
@@ -28,19 +33,15 @@ public class dlltest : MonoBehaviour
 
         Vector2 pos2d = new Vector2(transform.position.x, transform.position.y);
 
-        /*IntPtr ptr = negate_vec2(new float[] { pos2d.x, pos2d.y});
-        int arrayLength = 2;
-        // points to arr[1], which is first value
-        float[] result = new float[arrayLength];
-        Marshal.Copy(ptr, result, 0, arrayLength);
-
-        Vector2 negated = new Vector2(result[0], result[1]);
-        */
-
-        float[] negated = new float[] { pos2d.x, pos2d.y };
+        /*float[] negated = new float[] { pos2d.x, pos2d.y };
         negate_vec2(negated);
         Vector2 pos2d_negated = new Vector2(negated[0], negated[1]);
-        Debug.Log(pos2d + " negated is " + pos2d_negated);
+        Debug.Log(pos2d + " negated is " + pos2d_negated);*/
 
+        float[] pos_array = new float[] { pos2d.x, pos2d.y };
+        float[] result_array = new float[2];
+        add_vec2s(pos_array, pos_array, result_array);
+        Vector2 result = new Vector2(result_array[0], result_array[1]);
+        Debug.Log(pos2d + " added to itself is " + result);
     }
 }
