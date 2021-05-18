@@ -12,6 +12,11 @@ public class DllWrapper : MonoBehaviour
         [In, Out] float[] result_array);
 
 
+    /// <summary>
+    /// Calculates k, given two points and their link length towards k.
+    /// <br></br>
+    /// <b>Important:</b> Ensure that i -> j -> k traverses the triangle counter-clockwise.
+    /// </summary>
     public static Vector2 SymbolicKinematic(Vector2 i, Vector2 j, float distIK, float distJK)
     {
         float[] result = new float[2];

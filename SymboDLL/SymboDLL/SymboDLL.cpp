@@ -20,7 +20,8 @@ using namespace autodiff;
 static unsigned int myPlaceholderVariable;
 
 
-
+// i, j, k according to Disney paper
+// This assumes that i -> j -> k traverses the triangle counter-clockwise.
 void symbolic_kinematic(
 	float* i_array, float* j_array,
 	float dist_ik, float dist_jk,

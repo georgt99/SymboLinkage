@@ -73,25 +73,22 @@ public class Linkage : MonoBehaviour
                 }
             }
 
+            // ensure correct order of i and j
+            int indexI = 0, indexJ = 1;
+            Vector3 triNormal = new Plane(
+                fixedJoints[indexI].transform.position,
+                fixedJoints[indexJ].transform.position,
+                current.transform.position).normal;
+            if (triNormal.z < 0)
+            {
+                indexI = 1; indexJ = 0;
+            }
+
             // i, j, k according to Disney paper
-            Vector3 i = fixedJoints[0].transform.position;
-            Vector3 j = fixedJoints[1].transform.position;
-
-            float distIK = fixedJoints[0].GetEdgeToJoint(current).length;
-            float distJK = fixedJoints[1].GetEdgeToJoint(current).length;
-            /*float distIJ = Vector3.Distance(i, j);
-            float phi = Mathf.Acos(
-                (distIJ * distIJ + distIK * distIK - distJK * distJK)
-                /(2 * distIJ * distIK));
-
-            Plane triPlane = new Plane(i, j, current.transform.position);
-            Vector3 triNormal = triPlane.normal;
-
-            Quaternion R_phi = Quaternion.AngleAxis(Mathf.Rad2Deg * phi, triNormal);
-            
-            Vector3 k = R_phi * (distIK * (j - i) / Vector3.Magnitude(j - i)) + i;
-            current.transform.position = k;
-            */
+            Vector3 i = fixedJoints[indexI].transform.position;
+            Vector3 j = fixedJoints[indexJ].transform.position;
+            float distIK = fixedJoints[indexI].GetEdgeToJoint(current).length;
+            float distJK = fixedJoints[indexJ].GetEdgeToJoint(current).length;
 
             Vector3 k = DllWrapper.SymbolicKinematic(i, j, distIK, distJK);
             current.transform.position = k;
