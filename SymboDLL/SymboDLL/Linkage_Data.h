@@ -8,7 +8,7 @@ class Vertex {
 public:
 	int index;
 	float initial_x, initial_y;
-	vector<Vertex> edges = vector<Vertex>();
+	vector<int> edges = vector<int>();
 	VertexType type;
 };
 

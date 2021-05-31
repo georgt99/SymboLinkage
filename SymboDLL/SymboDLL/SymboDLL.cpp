@@ -21,7 +21,9 @@ using namespace autodiff;
 // DLL internal state variables:
 static vector<StaticVertex> static_verts;
 static vector<MotorizedVertex> motorized_verts;
-static vector<DynamicVertex> dynamic_verts; // these need to be ordered by dependencies
+static vector<DynamicVertex> dynamic_verts;
+static vector<int> ordered_dymanic_indices; // ordered by dependence
+static vector<Vertex> all_verts;
 static int num_vertices;
 
 // data preparation
@@ -30,28 +32,96 @@ void init() {
 	static_verts = vector<StaticVertex>();
 	motorized_verts = vector<MotorizedVertex>();
 	dynamic_verts = vector<DynamicVertex>();
+	ordered_dymanic_indices = vector<int>();
+	all_verts = vector<Vertex>();
 	num_vertices = 0;
 }
 
 int add_static_vertex(float x, float y) {
 	StaticVertex new_vert = StaticVertex(x, y, num_vertices++);
 	static_verts.push_back(new_vert);
+	all_verts.push_back(new_vert);
 	return new_vert.index;
 }
 
 int add_motorized_vertex(float x, float y, int motor_vertex, float distance_to_motor) {
 	MotorizedVertex new_vert = MotorizedVertex(x, y, motor_vertex, distance_to_motor, num_vertices++);
 	motorized_verts.push_back(new_vert);
+	all_verts.push_back(new_vert);
 	return new_vert.index;
 }
 
 int add_dynamic_vertex(float x, float y) {
 	DynamicVertex new_vert = DynamicVertex(x, y, num_vertices++);
 	dynamic_verts.push_back(new_vert);
+	all_verts.push_back(new_vert);
+	return new_vert.index;
+}
+
+void add_edge(int index_1, int index_2) {
+	all_verts[index_1].edges.push_back(index_2);
+	all_verts[index_2].edges.push_back(index_1);
 }
 
 bool prepare_simulation() {
-	// BIG TODO
+	// order dynamic vertices by dependence
+	int sorted = 0;
+	vector<vector<int>> dependencies = vector<vector<int>>(num_vertices, vector<int>());
+	list<int> ready = list<int>();
+	for (StaticVertex s_vert : static_verts) {
+		for (int adj : s_vert.edges) {
+			if (all_verts[adj].type == DYNAMIC) {
+				dependencies[adj].push_back(s_vert.index);
+				if (dependencies[adj].size() == 2) {
+					ready.push_back(adj);
+				}
+			}
+		}
+	}
+	for (MotorizedVertex m_vert : motorized_verts) {
+		for (int adj : m_vert.edges) {
+			if (all_verts[adj].type == DYNAMIC) {
+				dependencies[adj].push_back(m_vert.index);
+				if (dependencies[adj].size() == 2) {
+					ready.push_back(adj);
+				}
+			}
+		}
+	}
+	while (!ready.empty()) {
+		int current = ready.front(); ready.pop_front();
+		ordered_dymanic_indices.push_back(current);
+		//set dependants
+		Vector2f v0(all_verts[dependencies[current][0]].initial_x, all_verts[dependencies[current][0]].initial_y);
+		Vector2f v1(all_verts[dependencies[current][1]].initial_x, all_verts[dependencies[current][1]].initial_y);
+
+		for (DynamicVertex dyn_vert : dynamic_verts) {
+			if (dyn_vert.index == current) {
+				dyn_vert.dependant_i = dependencies[current][0];
+				dyn_vert.dependant_j = dependencies[current][1];
+				dyn_vert.distance_to_i = (Vector2f(dyn_vert.initial_x, dyn_vert.initial_y)
+					- Vector2f(all_verts[dyn_vert.dependant_i].initial_x, all_verts[dyn_vert.dependant_i].initial_y)).norm();
+				dyn_vert.distance_to_j = (Vector2f(dyn_vert.initial_x, dyn_vert.initial_y)
+					- Vector2f(all_verts[dyn_vert.dependant_j].initial_x, all_verts[dyn_vert.dependant_j].initial_y)).norm();
+				// TODO: fix orientation (counterclockwise)
+				// use normal probably?
+			}
+		}
+
+		sorted++;
+		for (int adj : all_verts[current].edges) {
+			if (all_verts[adj].type == DYNAMIC) {
+				dependencies[adj].push_back(all_verts[current].index);
+				if (dependencies[adj].size() == 2) {
+					ready.push_back(adj);
+				}
+			}
+		}
+	}
+	if (sorted < dynamic_verts.size()) {
+		return false; // did not manage to fit all
+	}
+	return true;
 }
 
 
