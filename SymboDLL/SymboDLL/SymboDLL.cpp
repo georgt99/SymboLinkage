@@ -61,6 +61,19 @@ int add_dynamic_vertex(float x, float y) {
 void add_edge(int index_1, int index_2) {
 	all_verts[index_1].edges.push_back(index_2);
 	all_verts[index_2].edges.push_back(index_1);
+
+	// UGLY QUICKFIX
+	for (int i = 0; i < static_verts.size(); i++) {
+		if (static_verts[i].index == index_1) static_verts[i].edges.push_back(index_2);
+		if (static_verts[i].index == index_2) static_verts[i].edges.push_back(index_1);
+	}
+	for (int i = 0; i < motorized_verts.size(); i++) {
+		if (motorized_verts[i].index == index_1) motorized_verts[i].edges.push_back(index_2);
+		if (motorized_verts[i].index == index_2) motorized_verts[i].edges.push_back(index_1);
+	}	for (int i = 0; i < dynamic_verts.size(); i++) {
+		if (dynamic_verts[i].index == index_1) dynamic_verts[i].edges.push_back(index_2);
+		if (dynamic_verts[i].index == index_2) dynamic_verts[i].edges.push_back(index_1);
+	}
 }
 
 bool prepare_simulation() {

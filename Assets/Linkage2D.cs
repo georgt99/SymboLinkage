@@ -92,16 +92,17 @@ public class Linkage2D : MonoBehaviour
                 DllWrapper.addEdge(j1.index, j2.index);
             }
         }
-        return;
         if (!DllWrapper.PrepareSimulation())
         {
             Debug.LogError("DLL-ERROR: Simulation coult not be prepared");
         }
+        UpdateMotors();
+        UpdateJointPositions();
     }
 
     private void Update()
     {
-        UpdateMotors();
+        //UpdateMotors();
         //UpdateJointPositions();
     }
 

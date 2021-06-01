@@ -28,7 +28,7 @@ public class DllWrapper : MonoBehaviour
     [DllImport("SymboDLL")]
     private static extern void set_motor_rotation(int vertex_index, float rotation);
     [DllImport("SymboDLL")]
-    private static extern void get_simulated_positions(float[][] output_array);
+    private static extern void get_simulated_positions([In, Out] float[][] output_array);
 
 
     /// <summary>
