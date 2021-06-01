@@ -317,6 +317,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19b4cbca8abdbde4292dd639106e1ab9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &420481061 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2421890845122392311, guid: a61a13fb5e53a9644b20b62edab24731, type: 3}
+  m_PrefabInstance: {fileID: 1042271309}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &420481062
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 420481061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b17d6781c11a20a4a840ef3f851f6875, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  originJoint: {fileID: 8483265524527330810}
+  axis: {x: 0, y: 0, z: 1}
+  currentRotation: 0
+  automaticRotationSpeed: 0
 --- !u!1001 &580654695
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -440,7 +461,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 702605086}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f074c37526a9bd84fa6ebf1e727dce9d, type: 3}
+  m_Script: {fileID: 11500000, guid: 8d84f6fddf1b6f74bbdfd09022b35f1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   linkPrefab: {fileID: 6974316071011199817, guid: 328a5a8d19936f044b3447b772ba2d06, type: 3}
@@ -661,27 +682,6 @@ TrailRenderer:
   m_MinVertexDistance: 0.1
   m_Autodestruct: 0
   m_Emitting: 1
---- !u!1 &731063269 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 2421890845122392311, guid: a61a13fb5e53a9644b20b62edab24731, type: 3}
-  m_PrefabInstance: {fileID: 8483265524527330808}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &731063273
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 731063269}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b17d6781c11a20a4a840ef3f851f6875, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetJoint: {fileID: 1042271310}
-  axis: {x: 0, y: 0, z: 1}
-  currentRotation: 0
-  automaticRotationSpeed: 0
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -798,7 +798,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2421890845122392311, guid: a61a13fb5e53a9644b20b62edab24731, type: 3}
       propertyPath: m_Name
-      value: Vertex (1)
+      value: Vertex (1) motorized
       objectReference: {fileID: 0}
     - target: {fileID: 8212499632148597764, guid: a61a13fb5e53a9644b20b62edab24731, type: 3}
       propertyPath: m_LocalPosition.x
@@ -851,7 +851,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -2200449255103050653, guid: a61a13fb5e53a9644b20b62edab24731, type: 3}
   m_PrefabInstance: {fileID: 1042271309}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 420481061}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19b4cbca8abdbde4292dd639106e1ab9, type: 3}
@@ -1190,7 +1190,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2421890845122392311, guid: a61a13fb5e53a9644b20b62edab24731, type: 3}
       propertyPath: m_Name
-      value: VertexWithMotor
+      value: Vertex (0)
       objectReference: {fileID: 0}
     - target: {fileID: 8212499632148597764, guid: a61a13fb5e53a9644b20b62edab24731, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1248,7 +1248,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: -2200449255103050653, guid: a61a13fb5e53a9644b20b62edab24731, type: 3}
   m_PrefabInstance: {fileID: 8483265524527330808}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 731063269}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 19b4cbca8abdbde4292dd639106e1ab9, type: 3}

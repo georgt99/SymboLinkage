@@ -8,6 +8,7 @@ public class Joint : MonoBehaviour
     public List<Joint> initialEdges;
     [HideInInspector]
     public List<Edge> edges = new List<Edge>(); // initialized by Linkage
+    public int index;
     public bool isAnchored = false;
 
 

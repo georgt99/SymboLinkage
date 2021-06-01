@@ -1,6 +1,8 @@
 #pragma once
 
+#include <vector>
 using namespace std;
+
 
 enum VertexType { STATIC, MOTORIZED, DYNAMIC };
 

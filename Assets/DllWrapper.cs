@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class DllWrapper : MonoBehaviour
 {
+    // deprecated
     [DllImport("SymboDLL")]
     private static extern void symbolic_kinematic(
         [In, Out] float[] i_array, [In, Out] float[] j_array,
@@ -12,8 +13,26 @@ public class DllWrapper : MonoBehaviour
         [In, Out] float[] result_array);
 
 
+    [DllImport("SymboDLL")]
+    private static extern void init();
+    [DllImport("SymboDLL")]
+    private static extern int add_static_vertex(float x, float y);
+    [DllImport("SymboDLL")]
+    private static extern int add_motorized_vertex(float x, float y, int motor_vertex, float distance_to_motor);
+    [DllImport("SymboDLL")]
+    private static extern int add_dynamic_vertex(float x, float y);
+    [DllImport("SymboDLL")]
+    private static extern void add_edge(int index_1, int index_2);
+    [DllImport("SymboDLL")]
+    private static extern bool prepare_simulation();
+    [DllImport("SymboDLL")]
+    private static extern void set_motor_rotation(int vertex_index, float rotation);
+    [DllImport("SymboDLL")]
+    private static extern void get_simulated_positions(float[][] output_array);
+
+
     /// <summary>
-    /// Calculates k, given two points and their link length towards k.
+    /// DEPRECATED | Calculates k, given two points and their link length towards k.
     /// <br></br>
     /// <b>Important:</b> Ensure that i -> j -> k traverses the triangle counter-clockwise.
     /// </summary>
@@ -26,6 +45,48 @@ public class DllWrapper : MonoBehaviour
 
 
 
+    public static void Init()
+    {
+        init();
+    }
+
+    public static int AddStaticVertex(Vector2 position)
+    {
+        return add_static_vertex(position.x, position.y);
+    }
+
+    public static int AddMotorizedVertex(Vector2 position, int motorVertex, float distanceToMotor)
+    {
+        return add_motorized_vertex(position.x, position.y, motorVertex, distanceToMotor);
+    }
+
+    public static int AddDynamicVertex(Vector2 position)
+    {
+        return add_dynamic_vertex(position.x, position.y);
+    }
+
+    public static void addEdge(int index1, int index2)
+    {
+        add_edge(index1, index2);
+    }
+
+    public static bool PrepareSimulation()
+    {
+        return prepare_simulation();
+    }
+
+    public static void setMotorRotation(int vertexIndex, float rotation)
+    {
+        set_motor_rotation(vertexIndex, rotation);
+    }
+
+    public static void getSimulatedPositions(float[][] output_array)
+    {
+        get_simulated_positions(output_array);
+    }
+
+
+    // helpers
 
     private static Vector2 ArrayToVec2(float[] arr)
     {

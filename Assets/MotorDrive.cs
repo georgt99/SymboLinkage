@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class MotorDrive : MonoBehaviour
 {
-    public Joint targetJoint;
+    public Joint originJoint;
     public Vector3 axis = Vector3.forward;
     public float currentRotation;
     public float automaticRotationSpeed; // in rotations per second
@@ -22,7 +22,7 @@ public class MotorDrive : MonoBehaviour
 
     private void RotateTargetAroundMotor(float angle)
     {
-        targetJoint.transform.RotateAround(transform.position, axis, angle);
+        transform.RotateAround(originJoint.transform.position, axis, angle);
 
     }
 
