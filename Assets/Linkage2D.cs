@@ -96,14 +96,12 @@ public class Linkage2D : MonoBehaviour
         {
             Debug.LogError("DLL-ERROR: Simulation coult not be prepared");
         }
-        UpdateMotors();
-        UpdateJointPositions();
     }
 
     private void Update()
     {
-        //UpdateMotors();
-        //UpdateJointPositions();
+        UpdateMotors();
+        UpdateJointPositions();
     }
 
     private void UpdateMotors()
@@ -116,15 +114,12 @@ public class Linkage2D : MonoBehaviour
 
     private void UpdateJointPositions()
     {
-        float[][] vertexCoordinates = new float[joints.Length][];
+        float[] xCoordinates = new float[joints.Length];
+        float[] yCoordinates = new float[joints.Length];
+        DllWrapper.getSimulatedPositions(xCoordinates, yCoordinates);
         for (int i = 0; i < joints.Length; i++)
         {
-            vertexCoordinates[i] = new float[2];
-        }
-        DllWrapper.getSimulatedPositions(vertexCoordinates);
-        for (int i = 0; i < joints.Length; i++)
-        {
-            joints[i].transform.position = new Vector2(vertexCoordinates[i][0], vertexCoordinates[i][1]);
+            joints[i].transform.position = new Vector2(xCoordinates[i], yCoordinates[i]);
         }
 
     }

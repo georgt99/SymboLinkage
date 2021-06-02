@@ -108,14 +108,14 @@ bool prepare_simulation() {
 		Vector2f v0(all_verts[dependencies[current][0]].initial_x, all_verts[dependencies[current][0]].initial_y);
 		Vector2f v1(all_verts[dependencies[current][1]].initial_x, all_verts[dependencies[current][1]].initial_y);
 
-		for (DynamicVertex dyn_vert : dynamic_verts) {
-			if (dyn_vert.index == current) {
-				dyn_vert.dependant_i = dependencies[current][0];
-				dyn_vert.dependant_j = dependencies[current][1];
-				dyn_vert.distance_to_i = (Vector2f(dyn_vert.initial_x, dyn_vert.initial_y)
-					- Vector2f(all_verts[dyn_vert.dependant_i].initial_x, all_verts[dyn_vert.dependant_i].initial_y)).norm();
-				dyn_vert.distance_to_j = (Vector2f(dyn_vert.initial_x, dyn_vert.initial_y)
-					- Vector2f(all_verts[dyn_vert.dependant_j].initial_x, all_verts[dyn_vert.dependant_j].initial_y)).norm();
+		for (int i = 0; i < dynamic_verts.size(); i++) {
+			if (dynamic_verts[i].index == current) {
+				dynamic_verts[i].dependant_i = dependencies[current][0];
+				dynamic_verts[i].dependant_j = dependencies[current][1];
+				dynamic_verts[i].distance_to_i = (Vector2f(dynamic_verts[i].initial_x, dynamic_verts[i].initial_y)
+					- Vector2f(all_verts[dynamic_verts[i].dependant_i].initial_x, all_verts[dynamic_verts[i].dependant_i].initial_y)).norm();
+				dynamic_verts[i].distance_to_j = (Vector2f(dynamic_verts[i].initial_x, dynamic_verts[i].initial_y)
+					- Vector2f(all_verts[dynamic_verts[i].dependant_j].initial_x, all_verts[dynamic_verts[i].dependant_j].initial_y)).norm();
 				// TODO: fix orientation (counterclockwise)
 				// use normal probably?
 			}
@@ -140,40 +140,40 @@ bool prepare_simulation() {
 
 // control
 void set_motor_rotation(int vertex_index, float rotation) {
-	for (MotorizedVertex m_vert : motorized_verts) {
-		if (m_vert.index == vertex_index) {
-			m_vert.current_rotation = rotation;
+	for (int i = 0; i < motorized_verts.size(); i++) {
+		if (motorized_verts[i].index == vertex_index) {
+			motorized_verts[i].current_rotation = rotation;
 			return;
 		}
 	}
 }
 
 // simulation
-void get_simulated_positions(float** output_array) {
+void get_simulated_positions(float* x_output_array, float* y_output_array) {
 	
 	// static
 	for (StaticVertex s_vert : static_verts) {
-		output_array[s_vert.index][0] = s_vert.initial_x;
-		output_array[s_vert.index][1] = s_vert.initial_y;
+		x_output_array[s_vert.index] = s_vert.initial_x;
+		y_output_array[s_vert.index] = s_vert.initial_y;
 	}
 
 	// motorized
 	for (MotorizedVertex m_vert : motorized_verts) {
-		Vector2f motor_position(output_array[m_vert.motor_vertex][0], output_array[m_vert.motor_vertex][1]);
+		Vector2f motor_position(x_output_array[m_vert.motor_vertex], y_output_array[m_vert.motor_vertex]);
 		
 		Rotation2D rot(m_vert.current_rotation);
 		Vector2f rotated_position = rot.toRotationMatrix() * Vector2f(m_vert.distance_to_motor, 0) + motor_position;
 
-		output_array[m_vert.index][0] = rotated_position.x();
-		output_array[m_vert.index][1] = rotated_position.y();
+		x_output_array[m_vert.index] = rotated_position.x();
+		y_output_array[m_vert.index] = rotated_position.y();
 	}
 
 	// dynamic
 	for (DynamicVertex d_vert : dynamic_verts) {
 
 
-		Vector2f i(output_array[d_vert.dependant_i][0], output_array[d_vert.dependant_i][1]);
-		Vector2f j(output_array[d_vert.dependant_j][0], output_array[d_vert.dependant_j][1]);
+		Vector2f i(x_output_array[d_vert.dependant_i], y_output_array[d_vert.dependant_i]);
+		Vector2f j(x_output_array[d_vert.dependant_j], y_output_array[d_vert.dependant_j]);
 		float dist_ik = d_vert.distance_to_i;
 		float dist_jk = d_vert.distance_to_j;
 		float dist_ij = (i - j).norm();
@@ -184,7 +184,7 @@ void get_simulated_positions(float** output_array) {
 
 		Rotation2D phi_rotation(phi);
 		Vector2f k = phi_rotation.toRotationMatrix() * (dist_ik * (j - i) / (j - i).norm()) + i;
-		output_array[d_vert.index][0] = k.x(); output_array[d_vert.index][1] = k.y();
+		x_output_array[d_vert.index] = k.x(); y_output_array[d_vert.index] = k.y();
 	}
 }
 

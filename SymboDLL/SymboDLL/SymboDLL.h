@@ -19,7 +19,7 @@ extern "C" SYMBOLINKAGE_API bool prepare_simulation();
 extern "C" SYMBOLINKAGE_API void set_motor_rotation(int vertex_index, float rotation); // TODO: this can fail
 
 // simulation
-extern "C" SYMBOLINKAGE_API void get_simulated_positions(float** output_array);
+extern "C" SYMBOLINKAGE_API void get_simulated_positions(float* x_output_array, float* y_output_array);
 
 
 
