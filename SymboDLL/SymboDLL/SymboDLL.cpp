@@ -116,8 +116,23 @@ bool prepare_simulation() {
 					- Vector2f(all_verts[dynamic_verts[i].dependant_i].initial_x, all_verts[dynamic_verts[i].dependant_i].initial_y)).norm();
 				dynamic_verts[i].distance_to_j = (Vector2f(dynamic_verts[i].initial_x, dynamic_verts[i].initial_y)
 					- Vector2f(all_verts[dynamic_verts[i].dependant_j].initial_x, all_verts[dynamic_verts[i].dependant_j].initial_y)).norm();
+				
 				// TODO: fix orientation (counterclockwise)
 				// use normal probably?
+				Vector2f k(dynamic_verts[i].initial_x, dynamic_verts[i].initial_y);
+				Vector2f dependant_i(all_verts[dynamic_verts[i].dependant_i].initial_x, all_verts[dynamic_verts[i].dependant_i].initial_y);
+				Vector2f dependant_j(all_verts[dynamic_verts[i].dependant_j].initial_x, all_verts[dynamic_verts[i].dependant_j].initial_y);
+				Vector2f k_to_i = dependant_i - k;
+				Vector2f k_to_j = dependant_j - k;
+				if (Vector3f(k_to_i.x(), k_to_i.y(), 0).cross(Vector3f(k_to_j.x(), k_to_j.y(), 0)).z() < 0) {
+					int tempindex = dynamic_verts[i].dependant_i;
+					dynamic_verts[i].dependant_i = dynamic_verts[i].dependant_j;
+					dynamic_verts[i].dependant_j = tempindex;
+
+					float tempdist = dynamic_verts[i].distance_to_i;
+					dynamic_verts[i].distance_to_i = dynamic_verts[i].distance_to_j;
+					dynamic_verts[i].distance_to_j = tempdist;
+				}
 			}
 		}
 
