@@ -22,10 +22,10 @@ namespace Symbo {
 	// must be called after all vertices/edges have been added and before simulating
 	extern "C" SYMBOLINKAGE_API bool prepare_simulation();
 
-	// control
+	// --- control ---
 	extern "C" SYMBOLINKAGE_API void set_motor_rotation(int vertex_index, float rotation);
 
-	// simulation
+	// --- simulation ---
 	extern "C" SYMBOLINKAGE_API void get_simulated_positions(float* x_output_array, float* y_output_array);
 
 

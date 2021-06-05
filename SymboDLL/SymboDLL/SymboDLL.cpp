@@ -29,20 +29,27 @@ namespace Symbo {
 	static list<MotorizedVertex> motorized_verts;
 	static list<DynamicVertex> dynamic_verts;
 	static vector<int> ordered_dymanic_indices; // ordered by dependence
-	static int num_vertices;
+	static int num_vertices = false;
+	static bool is_initialized;
 
-	// data preparation
+	// --- data preparation ---
 
 	void init() {
-		// TODO: garbage collection?
+		if (is_initialized) { // memory management
+			all_verts.clear();
+			static_verts.clear();
+			motorized_verts.clear();
+			dynamic_verts.clear();
+			ordered_dymanic_indices.clear();
+		}
 
 		all_verts = vector<Vertex*>();
-
 		static_verts = list<StaticVertex>();
 		motorized_verts = list<MotorizedVertex>();
 		dynamic_verts = list<DynamicVertex>();
 		ordered_dymanic_indices = vector<int>();
 		num_vertices = 0;
+		is_initialized = true;
 	}
 
 	int add_static_vertex(float x, float y) {
@@ -149,7 +156,8 @@ namespace Symbo {
 	}
 
 
-	// control
+	// --- control ---
+
 	void set_motor_rotation(int vertex_index, float rotation) {
 		for (auto it = motorized_verts.begin(); it != motorized_verts.end(); it++) {
 			if (it->index == vertex_index) {
@@ -159,7 +167,9 @@ namespace Symbo {
 		}
 	}
 
-	// simulation
+
+	// --- simulation ---
+	
 	void get_simulated_positions(float* x_output_array, float* y_output_array) {
 
 		// static
