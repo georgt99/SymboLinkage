@@ -102,37 +102,32 @@ namespace Symbo {
 		while (!ready.empty()) {
 			int current = ready.front(); ready.pop_front();
 			ordered_dymanic_indices.push_back(current);
+			
+			auto dyn = find_if(dynamic_verts.begin(), dynamic_verts.end(),
+				[current](DynamicVertex d) {return d.index == current; });
+				
 			//set dependants
-			Vector2f v0(all_verts[dependencies[current][0]]->initial_x, all_verts[dependencies[current][0]]->initial_y);
-			Vector2f v1(all_verts[dependencies[current][1]]->initial_x, all_verts[dependencies[current][1]]->initial_y);
+			dyn->dependant_i = dependencies[current][0];
+			dyn->dependant_j = dependencies[current][1];
+			Vector2f k(dyn->initial_x, dyn->initial_y);
+			Vector2f dependant_i(all_verts[dyn->dependant_i]->initial_x, all_verts[dyn->dependant_i]->initial_y);
+			Vector2f dependant_j(all_verts[dyn->dependant_j]->initial_x, all_verts[dyn->dependant_j]->initial_y);
+			Vector2f k_to_i = dependant_i - k;
+			Vector2f k_to_j = dependant_j - k;
+			dyn->distance_to_i = k_to_i.norm();
+			dyn->distance_to_j = k_to_j.norm();
 
-			for (auto it = dynamic_verts.begin(); it != dynamic_verts.end(); it++) {
-				if (it->index == current) {
-					it->dependant_i = dependencies[current][0];
-					it->dependant_j = dependencies[current][1];
-					it->distance_to_i = (Vector2f(it->initial_x, it->initial_y)
-						- Vector2f(all_verts[it->dependant_i]->initial_x, all_verts[it->dependant_i]->initial_y)).norm();
-					it->distance_to_j = (Vector2f(it->initial_x, it->initial_y)
-						- Vector2f(all_verts[it->dependant_j]->initial_x, all_verts[it->dependant_j]->initial_y)).norm();
+			// i -> j -> k must traverse the triangle counter-clockwise to ensure the correct orientation.
+			// therefore, switch if triangle-normal is wrong.
 
-					// TODO: fix orientation (counterclockwise)
-					// use normal probably?
-					Vector2f k(it->initial_x, it->initial_y);
-					Vector2f dependant_i(all_verts[it->dependant_i]->initial_x, all_verts[it->dependant_i]->initial_y);
-					Vector2f dependant_j(all_verts[it->dependant_j]->initial_x, all_verts[it->dependant_j]->initial_y);
-					Vector2f k_to_i = dependant_i - k;
-					Vector2f k_to_j = dependant_j - k;
-					if (Vector3f(k_to_i.x(), k_to_i.y(), 0).cross(Vector3f(k_to_j.x(), k_to_j.y(), 0)).z() < 0) {
-						int tempindex = it->dependant_i;
-						it->dependant_i = it->dependant_j;
-						it->dependant_j = tempindex;
+			if (Vector3f(k_to_i.x(), k_to_i.y(), 0).cross(Vector3f(k_to_j.x(), k_to_j.y(), 0)).z() < 0) {
+				int tempindex = dyn->dependant_i;
+				dyn->dependant_i = dyn->dependant_j;
+				dyn->dependant_j = tempindex;
 
-						float tempdist = it->distance_to_i;
-						it->distance_to_i = it->distance_to_j;
-						it->distance_to_j = tempdist;
-					}
-					break;
-				}
+				float tempdist = dyn->distance_to_i;
+				dyn->distance_to_i = dyn->distance_to_j;
+				dyn->distance_to_j = tempdist;
 			}
 
 			sorted++;
