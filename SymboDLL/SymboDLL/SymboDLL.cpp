@@ -5,7 +5,7 @@
 
 using namespace std;
 
-#include "Linkage_Data.cpp"
+#include "Linkage_Data.h"
 
 // Eigen
 #include <Eigen/Core>
@@ -85,12 +85,14 @@ namespace Symbo {
 
 	bool prepare_simulation() {
 		// order dynamic vertices by dependence
+		
 		int sorted = 0;
+		// tracks for each vertex what other vertices can be used for symbolic kinematics
 		vector<vector<int>> dependencies = vector<vector<int>>(num_vertices, vector<int>());
 		list<int> ready = list<int>();
 		for (StaticVertex s_vert : static_verts) {
 			for (int adj : s_vert.edges) {
-				if (all_verts[adj]->type == DYNAMIC) {
+				if (all_verts[adj]->type == VertexType::DYNAMIC) {
 					dependencies[adj].push_back(s_vert.index);
 					if (dependencies[adj].size() == 2) {
 						ready.push_back(adj);
@@ -100,7 +102,7 @@ namespace Symbo {
 		}
 		for (MotorizedVertex m_vert : motorized_verts) {
 			for (int adj : m_vert.edges) {
-				if (all_verts[adj]->type == DYNAMIC) {
+				if (all_verts[adj]->type == VertexType::DYNAMIC) {
 					dependencies[adj].push_back(m_vert.index);
 					if (dependencies[adj].size() == 2) {
 						ready.push_back(adj);
@@ -141,7 +143,7 @@ namespace Symbo {
 
 			sorted++;
 			for (int adj : all_verts[current]->edges) {
-				if (all_verts[adj]->type == DYNAMIC) {
+				if (all_verts[adj]->type == VertexType::DYNAMIC) {
 					dependencies[adj].push_back(all_verts[current]->index);
 					if (dependencies[adj].size() == 2) {
 						ready.push_back(adj);

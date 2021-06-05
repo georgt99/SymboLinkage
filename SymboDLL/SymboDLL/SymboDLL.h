@@ -11,7 +11,7 @@ namespace Symbo {
 
 	// --- data preparation ---
 
-	// must be called on startup
+	// must be called on startup, also acts as a reset
 	extern "C" SYMBOLINKAGE_API void init();
 	// add specified vertex and return its index, which is always equal to the number of add_?_vertex-calls so far
 	extern "C" SYMBOLINKAGE_API int add_static_vertex(float x, float y);

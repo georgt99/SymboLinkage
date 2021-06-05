@@ -6,7 +6,7 @@ public class MotorDrive : MonoBehaviour
 {
     public Joint originJoint;
     public Vector3 axis = Vector3.forward;
-    public float currentRotation;
+    public float currentRotation; // in degrees
     public float automaticRotationSpeed; // in rotations per second
 
 

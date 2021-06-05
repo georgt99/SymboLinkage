@@ -5,7 +5,7 @@ using namespace std;
 
 namespace Symbo {
 
-	enum VertexType { STATIC, MOTORIZED, DYNAMIC };
+	enum class VertexType { STATIC, MOTORIZED, DYNAMIC };
 
 	class Vertex {
 	public:
@@ -21,7 +21,7 @@ namespace Symbo {
 			this->initial_x = x;
 			this->initial_y = y;
 			this->index = index;
-			this->type = STATIC;
+			this->type = VertexType::STATIC;
 		}
 	};
 
@@ -37,7 +37,7 @@ namespace Symbo {
 			this->distance_to_motor = distance_to_motor;
 			this->current_rotation = 0;
 			this->index = index;
-			this->type = MOTORIZED;
+			this->type = VertexType::MOTORIZED;
 		}
 	};
 
@@ -49,7 +49,12 @@ namespace Symbo {
 			this->initial_x = x;
 			this->initial_y = y;
 			this->index = index;
-			this->type = DYNAMIC;
+			this->type = VertexType::DYNAMIC;
+			// these members are properly set as part of prepare_simulation()
+			this->dependant_i = -1;
+			this->dependant_j = -1;
+			this->distance_to_i = 0;
+			this->distance_to_j = 0;
 		}
 	};
 
