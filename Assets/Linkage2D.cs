@@ -94,7 +94,7 @@ public class Linkage2D : MonoBehaviour
         }
         if (!DllWrapper.PrepareSimulation())
         {
-            Debug.LogError("DLL-ERROR: Simulation coult not be prepared");
+            Debug.LogError("DLL-ERROR: Simulation could not be prepared");
         }
     }
 

@@ -5,4 +5,6 @@
 
 using namespace std;
 
-// wait do I even need this file? C++ is weird...
+namespace Symbo {
+	// no behavior needed for Linkage Data (yet)
+}
