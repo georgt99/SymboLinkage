@@ -18,7 +18,7 @@ public class DllWrapper : MonoBehaviour
     [DllImport("SymboDLL")]
     private static extern int add_static_vertex(float x, float y);
     [DllImport("SymboDLL")]
-    private static extern int add_motorized_vertex(float x, float y, int motor_vertex, float distance_to_motor);
+    private static extern int add_motorized_vertex(float x, float y, int motor_vertex);
     [DllImport("SymboDLL")]
     private static extern int add_dynamic_vertex(float x, float y);
     [DllImport("SymboDLL")]
@@ -57,9 +57,9 @@ public class DllWrapper : MonoBehaviour
         return add_static_vertex(position.x, position.y);
     }
 
-    public static int AddMotorizedVertex(Vector2 position, int motorVertex, float distanceToMotor)
+    public static int AddMotorizedVertex(Vector2 position, int motorVertex)
     {
-        return add_motorized_vertex(position.x, position.y, motorVertex, distanceToMotor);
+        return add_motorized_vertex(position.x, position.y, motorVertex);
     }
 
     public static int AddDynamicVertex(Vector2 position)

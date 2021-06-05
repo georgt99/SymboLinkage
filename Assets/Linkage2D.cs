@@ -70,8 +70,7 @@ public class Linkage2D : MonoBehaviour
             {
                 DllWrapper.AddMotorizedVertex(
                     j.transform.position,
-                    motor.originJoint.index,
-                    (j.transform.position - motor.originJoint.transform.position).magnitude
+                    motor.originJoint.index
                 );
             }
             else if (j.isAnchored) // static
@@ -108,7 +107,7 @@ public class Linkage2D : MonoBehaviour
     {
         foreach (MotorDrive motor in GetComponentsInChildren<MotorDrive>())
         {
-            DllWrapper.setMotorRotation(motor.GetComponent<Joint>().index, motor.currentRotation);
+            DllWrapper.setMotorRotation(motor.GetComponent<Joint>().index, Mathf.Deg2Rad * motor.currentRotation);
         }
     }
 

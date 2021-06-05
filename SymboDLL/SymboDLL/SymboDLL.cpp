@@ -53,8 +53,10 @@ namespace Symbo {
 		return new_index;
 	}
 
-	int add_motorized_vertex(float x, float y, int motor_vertex, float distance_to_motor) {
+	int add_motorized_vertex(float x, float y, int motor_vertex) {
 		int new_index = num_vertices++;
+		float distance_to_motor = (Vector2f(all_verts[motor_vertex]->initial_x, all_verts[motor_vertex]->initial_y)
+			- Vector2f(x, y)).norm();
 		MotorizedVertex new_vert = MotorizedVertex(x, y, motor_vertex, distance_to_motor, new_index);
 		motorized_verts.push_back(new_vert);
 		all_verts.push_back(&(*--motorized_verts.end())); // inserted at new_index

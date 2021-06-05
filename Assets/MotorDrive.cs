@@ -8,23 +8,20 @@ public class MotorDrive : MonoBehaviour
     public Vector3 axis = Vector3.forward;
     public float currentRotation;
     public float automaticRotationSpeed; // in rotations per second
-    private float lastRotation;
-    private float initialRotation;
 
+
+    private void Start()
+    {
+        currentRotation = Vector2.Angle(Vector2.right, transform.position - originJoint.transform.position);
+    }
 
     private void Update()
     {
         currentRotation += automaticRotationSpeed * 360 * Time.deltaTime;
-        RotateTargetAroundMotor(lastRotation - currentRotation);
-        lastRotation = currentRotation;
         currentRotation = currentRotation % 360;
     }
 
-    private void RotateTargetAroundMotor(float angle)
-    {
-        transform.RotateAround(originJoint.transform.position, axis, angle);
 
-    }
 
     private void OnDrawGizmos()
     {
