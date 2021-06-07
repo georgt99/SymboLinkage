@@ -12,7 +12,7 @@ public class MotorDrive : MonoBehaviour
 
     private void Start()
     {
-        currentRotation = Vector2.Angle(Vector2.right, transform.position - originJoint.transform.position);
+        currentRotation = Vector2.SignedAngle(Vector2.right, transform.position - originJoint.transform.position);
     }
 
     private void Update()
