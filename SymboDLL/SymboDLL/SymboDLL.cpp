@@ -29,8 +29,10 @@ namespace Symbo {
 	static list<MotorizedVertex> motorized_verts;
 	static list<DynamicVertex> dynamic_verts;
 	static vector<int> ordered_dymanic_indices; // ordered by dependence
+	static vector<pair<int, int>> edges;
 	static int num_vertices = false;
 	static bool is_initialized;
+
 
 	// --- data preparation ---
 
@@ -81,6 +83,7 @@ namespace Symbo {
 	void add_edge(int index_1, int index_2) {
 		all_verts[index_1]->edges.push_back(index_2);
 		all_verts[index_2]->edges.push_back(index_1);
+		edges.push_back(pair<int, int>(index_1, index_2));
 	}
 
 	bool prepare_simulation() {
@@ -232,6 +235,116 @@ namespace Symbo {
 		Rotation2D phi_rotation(phi);
 		Vector2f k = phi_rotation.toRotationMatrix() * (dist_ik * (j - i) / (j - i).norm()) + i;
 		output_array[0] = k.x(); output_array[1] = k.y();
+	}
+
+
+	dual get_edge_length_gardient(const VectorXdual& edge_lengths, const int vert_index, const Vector2dual& target_pos) {
+		
+		// Step 1: simulate all the positions
+		MatrixXdual positions(2, num_vertices); // x = coordinate, y = value
+
+		// static
+		for (StaticVertex s_vert : static_verts) {
+			positions(0, s_vert.index) = s_vert.initial_x;
+			positions(1, s_vert.index) = s_vert.initial_y;
+		}
+		
+		// motorized
+		for (MotorizedVertex m_vert : motorized_verts) {
+			Vector2dual motor_position(positions(0, m_vert.motor_vertex), positions(1, m_vert.motor_vertex));
+			
+			dual current_rotation = dual(); current_rotation = m_vert.current_rotation;
+			Rotation2D rot(current_rotation);
+			dual distance_to_motor = dual(); distance_to_motor = m_vert.distance_to_motor;
+			for (int i = 0; i < edges.size(); i++) {
+				if ((edges[i].first == m_vert.index && edges[i].second == m_vert.motor_vertex)
+					|| (edges[i].first == m_vert.motor_vertex && edges[i].second == m_vert.index)) {
+					distance_to_motor = edge_lengths[i];
+				}
+			}
+			Vector2dual horizontal(distance_to_motor, 0);
+			 
+			Vector2dual rotated_position = Vector2dual(
+				(MatrixXdual(rot.toRotationMatrix()) * horizontal + motor_position));
+
+			positions(0, m_vert.index) = rotated_position.x();
+			positions(1, m_vert.index) = rotated_position.y();
+		}
+		
+		// dynamic
+		for (DynamicVertex d_vert : dynamic_verts) {
+
+			
+			Vector2dual i(positions(0, d_vert.dependant_i), positions(1, d_vert.dependant_i));
+			Vector2dual j(positions(0, d_vert.dependant_j), positions(1, d_vert.dependant_j));
+			dual dist_ik = dual(); dist_ik = d_vert.distance_to_i;
+			dual dist_jk = dual();  dist_jk = d_vert.distance_to_j;
+			dual dist_ij = Vector2dual(i - j).norm();
+			int index_k = d_vert.index, index_i = d_vert.dependant_i, index_j = d_vert.dependant_j;
+			
+			// quick-n-dirty solution
+			for (int e = 0; e < edges.size(); e++) {
+				if ((edges[e].first == index_i && edges[e].second == index_k)
+					|| (edges[e].first == index_k && edges[e].second == index_i)) {
+					dist_ik = edge_lengths[e];
+					break;
+				}
+			}
+			for (int e = 0; e < edges.size(); e++) {
+				if ((edges[e].first == index_j && edges[e].second == index_k)
+					|| (edges[e].first == index_k && edges[e].second == index_j)) {
+					dist_jk = edge_lengths[e];
+					break;
+				}
+			}
+			for (int e = 0; e < edges.size(); e++) {
+				if ((edges[e].first == index_i && edges[e].second == index_j)
+					|| (edges[e].first == index_j && edges[e].second == index_i)) {
+					dist_ij = edge_lengths[e];
+					break;
+				}
+			}
+			dual phi = dual(); phi = acos(
+				(dist_ij * dist_ij + dist_ik * dist_ik - dist_jk * dist_jk)
+				/ (2 * dist_ij * dist_ik)
+			);
+
+			Rotation2D phi_rotation(phi);
+			Vector2dual k = Vector2dual(MatrixXdual(phi_rotation.toRotationMatrix()) * dist_ik * (j - i) / Vector2dual(j - i).norm() + i);
+			positions(0, d_vert.index) = k.x(); positions(1, d_vert.index) = k.y();
+		}
+		
+		// Step 2: check current error
+		Vector2dual current_position_of_vertex(positions(0, vert_index), positions(1, vert_index));
+		dual error = dual(); error = Vector2dual(current_position_of_vertex - target_pos).norm();
+		return error;
+	}
+
+
+	void get_edge_length_gradients_for_target_position(
+		float vertex_index, float x, float y,
+		int* first_end, int* second_end, float* gradient_for_edge
+	) {
+		VectorXdual edge_lengths = VectorXdual(edges.size());
+		for (int i = 0; i < edges.size(); i++) {
+			Vector2f v1(all_verts[edges[i].first]->initial_x, all_verts[edges[i].first]->initial_y);
+			Vector2f v2(all_verts[edges[i].second]->initial_x, all_verts[edges[i].second]->initial_y);
+			edge_lengths(i) = (v1 - v2).norm();
+		}
+
+		dual magnitude;
+		VectorXd g = gradient(
+			get_edge_length_gardient,
+			wrt(edge_lengths),
+			at(edge_lengths, vertex_index, Vector2dual(x, y)),
+			magnitude);
+
+		for (int i = 0; i < edges.size(); i++) {
+			first_end[i] = edges[i].first;
+			second_end[i] = edges[i].second;
+			gradient_for_edge[i] = g(i);
+		}
+
 	}
 
 }

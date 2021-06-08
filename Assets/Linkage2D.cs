@@ -9,7 +9,9 @@ public class Linkage2D : MonoBehaviour
 
     private Joint[] joints;
 
-    
+    private bool isSimulationPrepared;
+
+    private int dynamicEdgeCount = 0;
 
     private void OnDrawGizmos()
     {
@@ -88,19 +90,30 @@ public class Linkage2D : MonoBehaviour
         {
             foreach (Joint j2 in j1.initialEdges)
             {
-                DllWrapper.addEdge(j1.index, j2.index);
+                if ((!j1.isAnchored && !j1.GetComponent<MotorDrive>())
+                    || (!j2.isAnchored && !j2.GetComponent<MotorDrive>()))
+                {
+                    DllWrapper.addEdge(j1.index, j2.index);
+                    dynamicEdgeCount++;
+                }
             }
         }
         if (!DllWrapper.PrepareSimulation())
         {
             Debug.LogError("DLL-ERROR: Simulation could not be prepared");
+        } else
+        {
+            isSimulationPrepared = true;
         }
     }
 
     private void Update()
     {
-        UpdateMotors();
-        UpdateJointPositions();
+        if (isSimulationPrepared)
+        {
+            UpdateMotors();
+            UpdateJointPositions();
+        }
     }
 
     private void UpdateMotors()
@@ -120,9 +133,7 @@ public class Linkage2D : MonoBehaviour
         {
             joints[i].transform.position = new Vector2(xCoordinates[i], yCoordinates[i]);
         }
-
     }
-
 }
 
 
