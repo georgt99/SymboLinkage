@@ -465,6 +465,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   linkPrefab: {fileID: 6974316071011199817, guid: 328a5a8d19936f044b3447b772ba2d06, type: 3}
+  jointToBeOptimized: {fileID: 349719635}
 --- !u!4 &702605088
 Transform:
   m_ObjectHideFlags: 0

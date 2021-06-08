@@ -29,8 +29,8 @@ namespace Symbo {
 	extern "C" SYMBOLINKAGE_API void get_simulated_positions(float* x_output_array, float* y_output_array);
 
 	extern "C" SYMBOLINKAGE_API void get_edge_length_gradients_for_target_position( // this should probably be split into multiple calls
-		float vertex_index, float x, float y,
-		int* first_end, int* second_end, float* edge_length_gradient
+		int vertex_index, float x, float y,
+		float* first_end, float* second_end, float* edge_length_gradient
 	);
 
 

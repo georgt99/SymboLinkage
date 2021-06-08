@@ -31,6 +31,10 @@ public class DllWrapper : MonoBehaviour
     private static extern void get_simulated_positions(
         [In, Out] float[] x_output_array,
         [In, Out] float[] y_output_array);
+    [DllImport("SymboDLL")]
+    private static extern void get_edge_length_gradients_for_target_position(
+        int vertex_index, float x, float y,
+        [In, Out] float[] first_end, [In, Out] float[] second_end, [In, Out] float[] edge_length_gradient);
 
 
     /// <summary>
@@ -85,6 +89,13 @@ public class DllWrapper : MonoBehaviour
     public static void getSimulatedPositions(float[] x_output_array, float[] y_output_array)
     {
         get_simulated_positions(x_output_array, y_output_array);
+    }
+
+    public static void GetEdgeLengthGradientsForTargetPosition(int vertexIndex, Vector2 targetPos,
+        float[] firstEnd, float[] secondEnd, float[] edgeLengthGradient)
+    {
+        get_edge_length_gradients_for_target_position(vertexIndex, targetPos.x, targetPos.y,
+            firstEnd, secondEnd, edgeLengthGradient);
     }
 
 

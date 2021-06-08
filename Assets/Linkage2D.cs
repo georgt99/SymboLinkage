@@ -6,12 +6,14 @@ using UnityEditor;
 public class Linkage2D : MonoBehaviour
 {
     public GameObject linkPrefab;
+    public Joint jointToBeOptimized;
 
     private Joint[] joints;
 
     private bool isSimulationPrepared;
 
     private int dynamicEdgeCount = 0;
+    private float[] firstEnd = new float[0], secondEnd = new float[0], edgeGradient = new float[0];
 
     private void OnDrawGizmos()
     {
@@ -113,7 +115,34 @@ public class Linkage2D : MonoBehaviour
         {
             UpdateMotors();
             UpdateJointPositions();
+
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                ShowEdgeGradients();
+            }
         }
+    }
+
+    // TEMPORARY: display derivatives on edges
+    private void OnGUI()
+    {
+        for (int i = 0; i < edgeGradient.Length; i++)
+        {
+            Handles.DrawLine(joints[(int)firstEnd[i]].transform.position, joints[(int)secondEnd[i]].transform.position);
+            Handles.Label(
+                (joints[(int)firstEnd[i]].transform.position + joints[(int)secondEnd[i]].transform.position) / 2f,
+                edgeGradient[i].ToString());
+        }
+    }
+
+    private void ShowEdgeGradients()
+    {
+        Vector2 targetPos = Camera.main.ScreenToWorldPoint(
+            new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
+        firstEnd = new float[dynamicEdgeCount];
+        secondEnd = new float[dynamicEdgeCount];
+        edgeGradient = new float[dynamicEdgeCount];
+        DllWrapper.GetEdgeLengthGradientsForTargetPosition(jointToBeOptimized.index, targetPos, firstEnd, secondEnd, edgeGradient);
     }
 
     private void UpdateMotors()

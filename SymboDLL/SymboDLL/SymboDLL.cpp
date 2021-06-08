@@ -43,6 +43,7 @@ namespace Symbo {
 			motorized_verts.clear();
 			dynamic_verts.clear();
 			ordered_dymanic_indices.clear();
+			edges.clear();
 		}
 
 		all_verts = vector<Vertex*>();
@@ -50,6 +51,7 @@ namespace Symbo {
 		motorized_verts = list<MotorizedVertex>();
 		dynamic_verts = list<DynamicVertex>();
 		ordered_dymanic_indices = vector<int>();
+		edges = vector<pair<int, int>>();
 		num_vertices = 0;
 		is_initialized = true;
 	}
@@ -322,9 +324,10 @@ namespace Symbo {
 
 
 	void get_edge_length_gradients_for_target_position(
-		float vertex_index, float x, float y,
-		int* first_end, int* second_end, float* gradient_for_edge
+		int vertex_index, float x, float y,
+		float* first_end, float* second_end, float* gradient_for_edge
 	) {
+		
 		VectorXdual edge_lengths = VectorXdual(edges.size());
 		for (int i = 0; i < edges.size(); i++) {
 			Vector2f v1(all_verts[edges[i].first]->initial_x, all_verts[edges[i].first]->initial_y);
