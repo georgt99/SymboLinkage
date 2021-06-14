@@ -129,9 +129,10 @@ public class Linkage2D : MonoBehaviour
         for (int i = 0; i < edgeGradient.Length; i++)
         {
             Handles.DrawLine(joints[(int)firstEnd[i]].transform.position, joints[(int)secondEnd[i]].transform.position);
+            GUIStyle style = new GUIStyle(); style.fontSize = 18; style.fontStyle = FontStyle.Bold;
             Handles.Label(
                 (joints[(int)firstEnd[i]].transform.position + joints[(int)secondEnd[i]].transform.position) / 2f,
-                edgeGradient[i].ToString());
+                edgeGradient[i].ToString(), style);
         }
     }
 
@@ -139,6 +140,7 @@ public class Linkage2D : MonoBehaviour
     {
         Vector2 targetPos = Camera.main.ScreenToWorldPoint(
             new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
+        Debug.Log("Calculate gradient of target vertex towards " + targetPos);
         firstEnd = new float[dynamicEdgeCount];
         secondEnd = new float[dynamicEdgeCount];
         edgeGradient = new float[dynamicEdgeCount];
