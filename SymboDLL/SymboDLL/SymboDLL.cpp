@@ -12,6 +12,12 @@ using namespace std;
 #include <Eigen/Geometry>
 using namespace Eigen;
 
+// cppoptlib
+#include <cppoptlib/meta.h>
+#include <cppoptlib/problem.h>
+#include <cppoptlib/solver/bfgssolver.h>
+using namespace cppoptlib;
+
 // autodiff
 #include <autodiff/forward.hpp>
 #include <autodiff/forward/eigen.hpp>
@@ -325,8 +331,8 @@ namespace Symbo {
 
 	void get_edge_length_gradients_for_target_position(
 		int vertex_index, float x, float y,
-		float* first_end, float* second_end, float* gradient_for_edge
-	) {
+		float* first_end, float* second_end, float* gradient_for_edge)
+	{
 		
 		VectorXdual edge_lengths = VectorXdual(edges.size());
 		for (int i = 0; i < edges.size(); i++) {
@@ -348,6 +354,103 @@ namespace Symbo {
 			gradient_for_edge[i] = g(i);
 		}
 
+	}
+
+
+	// --- optimization ---
+
+	double objective_funcion_for_target_position(
+		VectorXd input_edge_lengths,
+		int vertex_index, float x, float y)
+	{
+
+		VectorXdual edge_lengths = VectorXdual(input_edge_lengths.size());
+		for (int i = 0; i < input_edge_lengths.size(); i++) {
+			edge_lengths(i) = input_edge_lengths(i);
+		}
+
+		dual magnitude;
+		VectorXd g = gradient(
+			get_edge_length_gardient,
+			wrt(edge_lengths),
+			at(edge_lengths, vertex_index, Vector2dual(x, y)),
+			magnitude);
+
+		return magnitude.val;
+	}
+
+	void gradient_for_target_position(
+		VectorXd input_edge_lengths,
+		int vertex_index, float x, float y,
+		VectorXd grad)
+	{
+		VectorXdual edge_lengths = VectorXdual(input_edge_lengths.size());
+		for (int i = 0; i < input_edge_lengths.size(); i++) {
+			edge_lengths(i) = input_edge_lengths(i);
+		}
+
+		dual magnitude;
+		VectorXd g = gradient(
+			get_edge_length_gardient,
+			wrt(edge_lengths),
+			at(edge_lengths, vertex_index, Vector2dual(x, y)),
+			magnitude);
+
+		for (int i = 0; i < g.size(); i++) {
+			grad(i) = g(i);
+		}
+	}
+
+	template<typename T> class EdgeLengthMinimizer : public Problem<T> {
+	public:
+		using typename Problem<T>::TVector;
+
+		int target_vert = 0;
+		Vector2d target_position;
+
+		void set_target(int vertex_index, float target_x, float target_y) {
+			target_vert = vertex_index;
+			target_position = Vector2d(target_x, target_y);
+		}
+
+
+		// objective function
+		T value(const TVector& x) {
+			return objective_funcion_for_target_position(x, target_vert, target_position.x(), target_position.y());
+		}
+
+		// optional override of gradient (we calculate it ourselves)
+		void gradient(const TVector& x, TVector& grad) {
+			gradient_for_target_position(x, target_vert, target_position.x(), target_position.y(), grad);
+		}
+	};
+
+	
+	void optimize_for_target_location(int vertex_index, float x, float y) {
+		VectorXd edge_lengths = VectorXd(edges.size());
+		for (int i = 0; i < edges.size(); i++) {
+			Vector2d v1(all_verts[edges[i].first]->initial_x, all_verts[edges[i].first]->initial_y);
+			Vector2d v2(all_verts[edges[i].second]->initial_x, all_verts[edges[i].second]->initial_y);
+			edge_lengths(i) = (v1 - v2).norm();
+		}
+
+		EdgeLengthMinimizer<double> f;
+		BfgsSolver<EdgeLengthMinimizer<double>> solver;
+
+		solver.minimize(f, edge_lengths);
+		
+		for (auto d = dynamic_verts.begin(); d != dynamic_verts.end(); d++) {
+			for (int i = 0; i < edges.size(); i++) {
+				if ((edges[i].first == d->index && edges[i].second == d->dependant_i)
+					|| edges[i].second == d->index && edges[i].first == d->dependant_i) {
+					d->distance_to_i = edge_lengths(i);
+				}
+				if ((edges[i].first == d->index && edges[i].second == d->dependant_j)
+					|| edges[i].second == d->index && edges[i].first == d->dependant_j) {
+					d->distance_to_j = edge_lengths(i);
+				}
+			}
+		}
 	}
 
 }

@@ -33,6 +33,10 @@ namespace Symbo {
 		float* first_end, float* second_end, float* edge_length_gradient
 	);
 
+	extern "C" SYMBOLINKAGE_API void optimize_for_target_location( // this should probably be split into multiple calls
+		int vertex_index, float x, float y
+	);
+
 
 	// DEPRECATED
 	extern "C" SYMBOLINKAGE_API void symbolic_kinematic(
