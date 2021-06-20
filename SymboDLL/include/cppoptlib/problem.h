@@ -1,11 +1,14 @@
 #ifndef PROBLEM_H
 #define PROBLEM_H
+#undef max // ADDED
+#undef min // ADDED
 
 #include <array>
 #include <vector>
 #include <Eigen/Core>
 
 #include "meta.h"
+
 
 namespace cppoptlib {
 
