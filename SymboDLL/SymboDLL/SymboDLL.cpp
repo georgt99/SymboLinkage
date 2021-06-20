@@ -426,7 +426,7 @@ namespace Symbo {
 	};
 
 	
-	void optimize_for_target_location(int vertex_index, float x, float y) {
+	bool optimize_for_target_location(int vertex_index, float x, float y) {
 		VectorXd edge_lengths = VectorXd(edges.size());
 		for (int i = 0; i < edges.size(); i++) {
 			Vector2d v1(all_verts[edges[i].first]->initial_x, all_verts[edges[i].first]->initial_y);
@@ -436,6 +436,9 @@ namespace Symbo {
 
 		EdgeLengthMinimizer<double> f;
 		BfgsSolver<EdgeLengthMinimizer<double>> solver;
+		
+		bool is_gradient_valid = f.checkGradient(edge_lengths);
+		if (!is_gradient_valid) return false;
 
 		solver.minimize(f, edge_lengths);
 		
@@ -451,6 +454,7 @@ namespace Symbo {
 				}
 			}
 		}
+		return true;
 	}
 
 }

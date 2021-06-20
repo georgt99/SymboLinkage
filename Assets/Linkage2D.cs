@@ -157,7 +157,14 @@ public class Linkage2D : MonoBehaviour
         Vector2 targetPos = Camera.main.ScreenToWorldPoint(
             new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
         Debug.Log("Optimize edge lengths to move target vertex towards " + targetPos);
-        DllWrapper.OptimizeForTargetLocation(jointToBeOptimized.index, targetPos);
+        bool success = DllWrapper.OptimizeForTargetLocation(jointToBeOptimized.index, targetPos);
+        if (success)
+        {
+            Debug.Log("Sucessfully optimized");
+        } else
+        {
+            Debug.Log("Optimization failed");
+        }
     }
 
     private void UpdateMotors()
