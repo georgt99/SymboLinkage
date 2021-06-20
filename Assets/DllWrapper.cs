@@ -35,6 +35,9 @@ public class DllWrapper : MonoBehaviour
     private static extern void get_edge_length_gradients_for_target_position(
         int vertex_index, float x, float y,
         [In, Out] float[] first_end, [In, Out] float[] second_end, [In, Out] float[] edge_length_gradient);
+    [DllImport("SymboDLL")]
+    private static extern void optimize_for_target_location(
+        int vertex_index, float x, float y);
 
 
     /// <summary>
@@ -98,6 +101,10 @@ public class DllWrapper : MonoBehaviour
             firstEnd, secondEnd, edgeLengthGradient);
     }
 
+    public static void OptimizeForTargetLocation(int vertex_index, Vector2 target)
+    {
+        optimize_for_target_location(vertex_index, target.x, target.y);
+    }
 
     // helpers
 

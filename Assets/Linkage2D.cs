@@ -103,7 +103,8 @@ public class Linkage2D : MonoBehaviour
         if (!DllWrapper.PrepareSimulation())
         {
             Debug.LogError("DLL-ERROR: Simulation could not be prepared");
-        } else
+        }
+        else
         {
             isSimulationPrepared = true;
         }
@@ -119,6 +120,10 @@ public class Linkage2D : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.D))
             {
                 ShowEdgeGradients();
+            }
+            else if (Input.GetKeyDown(KeyCode.O))
+            {
+                OptimizeForTargetLocation();
             }
         }
     }
@@ -145,6 +150,14 @@ public class Linkage2D : MonoBehaviour
         secondEnd = new float[dynamicEdgeCount];
         edgeGradient = new float[dynamicEdgeCount];
         DllWrapper.GetEdgeLengthGradientsForTargetPosition(jointToBeOptimized.index, targetPos, firstEnd, secondEnd, edgeGradient);
+    }
+
+    private void OptimizeForTargetLocation()
+    {
+        Vector2 targetPos = Camera.main.ScreenToWorldPoint(
+            new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
+        Debug.Log("Optimize edge lengths to move target vertex towards " + targetPos);
+        DllWrapper.OptimizeForTargetLocation(jointToBeOptimized.index, targetPos);
     }
 
     private void UpdateMotors()
