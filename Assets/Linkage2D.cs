@@ -121,7 +121,7 @@ public class Linkage2D : MonoBehaviour
             {
                 ShowEdgeGradients();
             }
-            else if (Input.GetKeyDown(KeyCode.O))
+            else if (Input.GetKey(KeyCode.O))
             {
                 OptimizeForTargetLocation();
             }

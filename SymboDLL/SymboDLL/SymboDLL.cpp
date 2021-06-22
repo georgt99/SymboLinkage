@@ -360,11 +360,11 @@ namespace Symbo {
 
 	// --- optimization ---
 
-	double objective_funcion_for_target_position(
-		VectorXd input_edge_lengths,
+	struct grad_and_objective { VectorXd grad; double objective; };
+	grad_and_objective gradient_and_objective_for_target_position(
+		const VectorXd& input_edge_lengths,
 		int vertex_index, float x, float y)
 	{
-
 		VectorXdual edge_lengths = VectorXdual(input_edge_lengths.size());
 		for (int i = 0; i < input_edge_lengths.size(); i++) {
 			edge_lengths(i) = input_edge_lengths(i);
@@ -377,29 +377,14 @@ namespace Symbo {
 			at(edge_lengths, vertex_index, Vector2dual(x, y)),
 			magnitude);
 
-		return magnitude.val;
-	}
-
-	void gradient_for_target_position(
-		VectorXd input_edge_lengths,
-		int vertex_index, float x, float y,
-		VectorXd grad)
-	{
-		VectorXdual edge_lengths = VectorXdual(input_edge_lengths.size());
-		for (int i = 0; i < input_edge_lengths.size(); i++) {
-			edge_lengths(i) = input_edge_lengths(i);
-		}
-
-		dual magnitude;
-		VectorXd g = gradient(
-			get_edge_length_gardient,
-			wrt(edge_lengths),
-			at(edge_lengths, vertex_index, Vector2dual(x, y)),
-			magnitude);
-
+		VectorXd grad = VectorXd(input_edge_lengths.size());
 		for (int i = 0; i < g.size(); i++) {
 			grad(i) = - g(i);
 		}
+		grad_and_objective ret;
+		ret.grad = grad;
+		ret.objective = magnitude.val;
+		return ret;
 	}
 
 	template<typename T> class EdgeLengthMinimizer : public Problem<T> {
@@ -417,12 +402,16 @@ namespace Symbo {
 
 		// objective function
 		T value(const TVector& x) {
-			return objective_funcion_for_target_position(x, target_vert, target_position.x(), target_position.y());
+			auto [grad, obj] = gradient_and_objective_for_target_position(x, target_vert, target_position.x(), target_position.y());
+			return obj;
 		}
 
 		// optional override of gradient (we calculate it ourselves)
 		void gradient(const TVector& x, TVector& grad) {
-			gradient_for_target_position(x, target_vert, target_position.x(), target_position.y(), grad);
+			auto [gradients, obj] = gradient_for_target_position(x, target_vert, target_position.x(), target_position.y());
+			for (int i = 0; i < gradients.size(); i++) {
+				grad[i] = gradients(i);
+			}
 		}
 	};
 
@@ -441,7 +430,17 @@ namespace Symbo {
 			Vector2d v2(all_verts[edges[i].second]->initial_x, all_verts[edges[i].second]->initial_y);
 			edge_lengths(i) = (v1 - v2).norm();
 		}
-
+		for (auto d = dynamic_verts.begin(); d != dynamic_verts.end(); d++) { // ugly solution to get up-to-date lengths
+			for (int i = 0; i < edges.size(); i++) {
+				if (edges[i].first == d->index && edges[i].second == d->dependant_i || edges[i].second == d->index && edges[i].first == d->dependant_i) {
+					edge_lengths[i] = d->distance_to_i;
+				}
+				if (edges[i].first == d->index && edges[i].second == d->dependant_j || edges[i].second == d->index && edges[i].first == d->dependant_j) {
+					edge_lengths[i] = d->distance_to_j;
+				}
+			}
+		}
+		/*
 		EdgeLengthMinimizer<double> f;
 		GradientDescentSolver<EdgeLengthMinimizer<double>> solver;
 		
@@ -451,16 +450,18 @@ namespace Symbo {
 		//if (!is_gradient_valid) return false;
 
 		solver.minimize(f, edge_lengths);
-		
+		*/
+		auto [grad, obj] = gradient_and_objective_for_target_position(edge_lengths, vertex_index, x, y);
+
 		for (auto d = dynamic_verts.begin(); d != dynamic_verts.end(); d++) {
 			for (int i = 0; i < edges.size(); i++) {
 				if ((edges[i].first == d->index && edges[i].second == d->dependant_i)
 					|| edges[i].second == d->index && edges[i].first == d->dependant_i) {
-					d->distance_to_i = edge_lengths(i);
+					d->distance_to_i = edge_lengths(i) + grad(i) * 0.01 * min(obj, 1.0);
 				}
 				if ((edges[i].first == d->index && edges[i].second == d->dependant_j)
 					|| edges[i].second == d->index && edges[i].first == d->dependant_j) {
-					d->distance_to_j = edge_lengths(i);
+					d->distance_to_j = edge_lengths(i) + grad(i) * 0.01 * min(obj, 1.0);
 				}
 			}
 		}
