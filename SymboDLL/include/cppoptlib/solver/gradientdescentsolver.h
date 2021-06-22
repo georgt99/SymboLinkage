@@ -32,7 +32,7 @@ public:
       const Scalar rate = MoreThuente<ProblemType, 1>::linesearch(x0, -direction, objFunc) ;
       x0 = x0 - rate * direction;
       this->m_current.gradNorm = direction.template lpNorm<Eigen::Infinity>();
-      // std::cout << "iter: "<<iter<< " f = " <<  objFunc.value(x0) << " ||g||_inf "<<gradNorm  << std::endl;
+      std::cout << "iter: "<<42<< " f = " <<  objFunc.value(x0) << " ||g||_inf "<< this->m_current.gradNorm << std::endl;
       ++this->m_current.iterations;
       this->m_status = checkConvergence(this->m_stop, this->m_current);
     } while (objFunc.callback(this->m_current, x0) && (this->m_status == Status::Continue));

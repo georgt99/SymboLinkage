@@ -2,7 +2,7 @@
 #include <utility>
 #include <limits.h>
 #include "SymboDLL.h"
-
+#include <fstream>
 using namespace std;
 
 #include "Linkage_Data.h"
@@ -16,6 +16,7 @@ using namespace Eigen;
 #include <cppoptlib/meta.h>
 #include <cppoptlib/problem.h>
 #include <cppoptlib/solver/bfgssolver.h>
+#include <cppoptlib/solver/gradientdescentsolver.h>
 using namespace cppoptlib;
 
 // autodiff
@@ -397,7 +398,7 @@ namespace Symbo {
 			magnitude);
 
 		for (int i = 0; i < g.size(); i++) {
-			grad(i) = g(i);
+			grad(i) = - g(i);
 		}
 	}
 
@@ -427,6 +428,13 @@ namespace Symbo {
 
 	
 	bool optimize_for_target_location(int vertex_index, float x, float y) {
+		// ---------- DEBUG -------------
+		ofstream out("unity_symbo_dll_cout.txt"); cout.rdbuf(out.rdbuf());
+		ofstream err("unity_symbo_dll_cerr.txt"); cerr.rdbuf(err.rdbuf());
+		cout << "writing to cout" << endl;
+		cerr << "writing to cerr" << endl;
+		// ---------- DEBUG -------------
+
 		VectorXd edge_lengths = VectorXd(edges.size());
 		for (int i = 0; i < edges.size(); i++) {
 			Vector2d v1(all_verts[edges[i].first]->initial_x, all_verts[edges[i].first]->initial_y);
@@ -435,10 +443,12 @@ namespace Symbo {
 		}
 
 		EdgeLengthMinimizer<double> f;
-		BfgsSolver<EdgeLengthMinimizer<double>> solver;
+		GradientDescentSolver<EdgeLengthMinimizer<double>> solver;
 		
+		f.set_target(vertex_index, x, y);
+
 		bool is_gradient_valid = f.checkGradient(edge_lengths);
-		if (!is_gradient_valid) return false;
+		//if (!is_gradient_valid) return false;
 
 		solver.minimize(f, edge_lengths);
 		
