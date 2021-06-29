@@ -408,14 +408,14 @@ namespace Symbo {
 
 		// optional override of gradient (we calculate it ourselves)
 		void gradient(const TVector& x, TVector& grad) {
-			auto [gradients, obj] = gradient_for_target_position(x, target_vert, target_position.x(), target_position.y());
+			auto [gradients, obj] = gradient_and_objective_for_target_position(x, target_vert, target_position.x(), target_position.y());
 			for (int i = 0; i < gradients.size(); i++) {
 				grad[i] = gradients(i);
 			}
 		}
 	};
 
-	
+
 	bool optimize_for_target_location(int vertex_index, float x, float y) {
 		// ---------- DEBUG -------------
 		ofstream out("unity_symbo_dll_cout.txt"); cout.rdbuf(out.rdbuf());
@@ -423,7 +423,7 @@ namespace Symbo {
 		cout << "writing to cout" << endl;
 		cerr << "writing to cerr" << endl;
 		// ---------- DEBUG -------------
-
+		
 		VectorXd edge_lengths = VectorXd(edges.size());
 		for (int i = 0; i < edges.size(); i++) {
 			Vector2d v1(all_verts[edges[i].first]->initial_x, all_verts[edges[i].first]->initial_y);
@@ -440,17 +440,17 @@ namespace Symbo {
 				}
 			}
 		}
-		/*
-		EdgeLengthMinimizer<double> f;
+		
+		/*EdgeLengthMinimizer<double> f;
 		GradientDescentSolver<EdgeLengthMinimizer<double>> solver;
 		
 		f.set_target(vertex_index, x, y);
 
 		bool is_gradient_valid = f.checkGradient(edge_lengths);
-		//if (!is_gradient_valid) return false;
+		if (!is_gradient_valid) return false;
 
-		solver.minimize(f, edge_lengths);
-		*/
+		solver.minimize(f, edge_lengths);*/
+		
 		auto [grad, obj] = gradient_and_objective_for_target_position(edge_lengths, vertex_index, x, y);
 
 		for (auto d = dynamic_verts.begin(); d != dynamic_verts.end(); d++) {
