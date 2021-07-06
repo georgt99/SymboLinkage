@@ -32,9 +32,6 @@ public class Linkage3D : MonoBehaviour
 
     private void InitializeEdges()
     {
-        GameObject linkHolder = new GameObject("LinkHolder");
-        linkHolder.transform.parent = transform;
-        linkHolder.transform.localPosition = Vector3.zero;
         foreach (Joint3D j1 in GetComponentsInChildren<Joint3D>())
         {
             j1.distToConeTip = Vector3.Distance(j1.transform.position, coneTip);

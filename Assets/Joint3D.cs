@@ -74,6 +74,11 @@ public class Joint3D : MonoBehaviour
         // display edges
         foreach (Joint3D j in initialEdges)
             Gizmos.DrawLine(transform.position, j.transform.position);
+
+        if (isAnchored)
+        {
+            //Gizmos.DrawWireSphere(transform.position, transform.lossyScale.x / 4f);
+        }
     }
 }
 
