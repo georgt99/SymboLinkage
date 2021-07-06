@@ -511,13 +511,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1219246892}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 48eb130d4b4d0bb499d32ac44aa1a2c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  dependant1: {fileID: 1888023184}
-  dependant2: {fileID: 906553894}
+  dependant1: {fileID: 906553894}
+  dependant2: {fileID: 1888023184}
+  cone: {fileID: 1435386000}
 --- !u!1 &1435385998
 GameObject:
   m_ObjectHideFlags: 0

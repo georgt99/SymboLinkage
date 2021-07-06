@@ -7,6 +7,9 @@ public class Linkage3D : MonoBehaviour
 {
     public float coneHeight = 1;
     public float coneRadius = 1;
+    public Vector3 coneTip { get => transform.position + Vector3.up * coneHeight; }
+
+    private List<Joint3D> orderedJoints;
 
     private void OnDrawGizmos()
     {
@@ -20,8 +23,108 @@ public class Linkage3D : MonoBehaviour
         }
 
     }
-    
+
+    private void Start()
+    {
+        InitializeEdges();
+        orderedJoints = GetJointOrderForSimulation();
+    }
+
+    private void InitializeEdges()
+    {
+        GameObject linkHolder = new GameObject("LinkHolder");
+        linkHolder.transform.parent = transform;
+        linkHolder.transform.localPosition = Vector3.zero;
+        foreach (Joint3D j1 in GetComponentsInChildren<Joint3D>())
+        {
+            j1.distToConeTip = Vector3.Distance(j1.transform.position, coneTip);
+            foreach (Joint3D j2 in j1.initialEdges) // initial edges are directed for simpler storage
+            {
+                Edge3D newEdge = new Edge3D
+                {
+                    j1 = j1,
+                    j2 = j2,
+                    length = Vector3.Distance(j1.transform.position, j2.transform.position)
+                };
+                j1.edges.Add(newEdge);
+                j2.edges.Add(newEdge);
+            }
+        }
+    }
+
+    private List<Joint3D> GetJointOrderForSimulation()
+    {
+        Dictionary<Joint3D, List<Edge3D>> fixedAdjacents = new Dictionary<Joint3D, List<Edge3D>>();
+        foreach (Joint3D j in GetComponentsInChildren<Joint3D>())
+        {
+            if (!j.isAnchored)
+            {
+                fixedAdjacents[j] = new List<Edge3D>();
+            }
+        }
+
+        Queue<Joint3D> readyJoints = new Queue<Joint3D>();
+        foreach (Joint3D j in GetComponentsInChildren<Joint3D>())
+        {
+            if (j.isAnchored)
+            {
+                foreach (Edge3D e in j.edges)
+                {
+                    Joint3D adj = e.GetOtherJoint(j);
+                    if (adj.isAnchored) continue;
+                    fixedAdjacents[adj].Add(e);
+                    if (fixedAdjacents[adj].Count == 2)
+                    {
+                        readyJoints.Enqueue(adj);
+                    }
+                }
+            }
+        }
+        List<Joint3D> order = new List<Joint3D>();
+        while (readyJoints.Count > 0)
+        {
+            Joint3D current = readyJoints.Dequeue();
+            order.Add(current);
+
+            Edge3D dep1 = fixedAdjacents[current][0];
+            Edge3D dep2 = fixedAdjacents[current][1];
+            if (new Plane(
+                current.transform.position,
+                dep1.GetOtherJoint(current).transform.position,
+                dep1.GetOtherJoint(current).transform.position).GetSide(coneTip) == false) // ensure correct orientation
+            {
+                Edge3D tmp = dep1;
+                dep1 = dep2;
+                dep2 = tmp;
+            }
+
+            current.dependant1 = dep1;
+            current.dependant2 = dep2;
+            
+            foreach (Edge3D edge in current.edges)
+            {
+                Joint3D adj = edge.GetOtherJoint(current);
+                if (adj.isAnchored) continue;
+                fixedAdjacents[adj].Add(edge);
+                if (fixedAdjacents[adj].Count == 2)
+                {
+                    readyJoints.Enqueue(adj);
+                }
+            }
+        }
+        return order;
+    }
+
+    private void Update()
+    {
+        foreach (Joint3D current in orderedJoints)
+        {
+            current.SimulatePosition();
+        }
+    }
+
 }
+
 
 
 // Editor
