@@ -38,6 +38,9 @@ public class DllWrapper : MonoBehaviour
     [DllImport("SymboDLL")]
     private static extern bool optimize_for_target_location(
         int vertex_index, float x, float y);
+    [DllImport("SymboDLL")]
+    private static extern bool optimize_for_target_path(
+    int vertex_index, int number_of_path_points, [In, Out] float[] path_x, [In, Out] float[] path_y, int simulation_resolution);
 
 
     /// <summary>
@@ -104,6 +107,18 @@ public class DllWrapper : MonoBehaviour
     public static bool OptimizeForTargetLocation(int vertex_index, Vector2 target)
     {
         return optimize_for_target_location(vertex_index, target.x, target.y);
+    }
+
+    public static bool OptimizeForTargetPath(int vertex_index, Vector2[] targetPath, int simulationResolution)
+    {
+        float[] path_x = new float[targetPath.Length];
+        float[] path_y = new float[targetPath.Length];
+        for (int i = 0; i < targetPath.Length; i++)
+        {
+            path_x[i] = targetPath[i].x;
+            path_y[i] = targetPath[i].y;
+        }
+        return optimize_for_target_path(vertex_index, targetPath.Length, path_x, path_y, simulationResolution);
     }
 
     // helpers

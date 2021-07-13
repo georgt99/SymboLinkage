@@ -33,8 +33,12 @@ namespace Symbo {
 		float* first_end, float* second_end, float* edge_length_gradient
 	);
 
-	extern "C" SYMBOLINKAGE_API bool optimize_for_target_location( // this should probably be split into multiple calls
+	extern "C" SYMBOLINKAGE_API bool optimize_for_target_location(
 		int vertex_index, float x, float y
+	);
+
+	extern "C" SYMBOLINKAGE_API bool optimize_for_target_path(
+		int vertex_index, int number_of_path_points, float* path_x, float* path_y, int simulation_resolution
 	);
 
 

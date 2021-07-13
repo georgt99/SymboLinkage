@@ -105,8 +105,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 2421890845122392311}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19b4cbca8abdbde4292dd639106e1ab9, type: 3}
+  m_Script: {fileID: 11500000, guid: 5c6a1bb8f2a4ede4984cc0e55942a3dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   initialEdges: []
+  index: 0
   isAnchored: 0
